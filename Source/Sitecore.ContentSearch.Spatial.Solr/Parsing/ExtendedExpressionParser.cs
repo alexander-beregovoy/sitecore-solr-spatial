@@ -27,10 +27,37 @@ namespace Sitecore.ContentSearch.Spatial.Solr.Parsing
             switch (methodCall.Method.Name)
             {
                 case "WithinRadius":
-                    var queryNode = this.VisitWithinRadiusMethod(methodCall);
-                    return queryNode;
+                    var withinRadiusNode = this.VisitWithinRadiusMethod(methodCall);
+                    return withinRadiusNode;
+
+                case "WithinBounds":
+                    var withinBoundsNode = this.VisitWithinBoundsMethod(methodCall);
+                    return withinBoundsNode;
+
             }
             return base.VisitQueryableExtensionMethod(methodCall);
+        }
+
+        private QueryNode VisitWithinBoundsMethod(MethodCallExpression methodCall)
+        {
+            var sourceNode = Visit(GetArgument(methodCall.Arguments, 0));
+
+            var lowerLeftLatExpression = Visit(GetArgument(methodCall.Arguments, 2));
+            var lowerLeftLonExpression = Visit(GetArgument(methodCall.Arguments, 3));
+            var upperRightLatExpression = Visit(GetArgument(methodCall.Arguments, 4));
+            var upperRightLonExpression = Visit(GetArgument(methodCall.Arguments, 5));
+
+            var lowerLeftLat = GetConstantValue<double>(lowerLeftLatExpression);
+            var lowerLeftLon = GetConstantValue<double>(lowerLeftLonExpression);
+            var upperRightLat = GetConstantValue<double>(upperRightLatExpression);
+            var upperRightLon = GetConstantValue<double>(upperRightLonExpression);
+
+            LambdaExpression lambdaExpression = Convert<LambdaExpression>(StripQuotes(GetArgument(methodCall.Arguments, 1)));
+            var fieldNode = Visit(lambdaExpression.Body) as FieldNode;
+            if (fieldNode == null)
+                throw new InvalidOperationException(string.Format("Unable to get field name from the specified lambda expression '{0}'", lambdaExpression.Body));
+
+            return new WithinBoundsNode(sourceNode, fieldNode.FieldKey, lowerLeftLat, lowerLeftLon, upperRightLat, upperRightLon);
         }
 
         protected virtual QueryNode VisitWithinRadiusMethod(MethodCallExpression methodCall)

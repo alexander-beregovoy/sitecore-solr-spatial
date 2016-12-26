@@ -11,6 +11,7 @@
     <AssemblyName>Sitecore.ContentSearch.Spatial.Solr</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -86,6 +87,7 @@
   <ItemGroup>
     <Compile Include="Common\GenericDumpable.cs" />
     <Compile Include="Indexing\SpatialSolrQueryOptimizer.cs" />
+    <Compile Include="Nodes\WithinBoundsNode.cs" />
     <Compile Include="Parsing\ExtendedGenericQueryable.cs" />
     <Compile Include="Parsing\ExtendedExpressionParser.cs" />
     <Compile Include="Indexing\LinqToSolrIndexWithSpatial.cs" />

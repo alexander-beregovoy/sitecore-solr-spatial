@@ -15,12 +15,36 @@ namespace Sitecore.ContentSearch.Spatial.Solr.Indexing
         {
             if (node.NodeType == QueryNodeType.Custom)
             {
-                if (node is WithinRadiusNode)
+                var withinRadiusNode = node as WithinRadiusNode;
+                if (withinRadiusNode != null)
                 {
-                    return VisitWithinRadius((WithinRadiusNode)node, state);
+                    return VisitWithinRadius(withinRadiusNode, state);
+                }
+
+                var withinBoundsNode = node as WithinBoundsNode;
+                if (withinBoundsNode != null)
+                {
+                    return VisitWithinBound(withinBoundsNode, state);
                 }
             }
             return base.Visit(node, state);
+        }
+
+        private AbstractSolrQuery VisitWithinBound(WithinBoundsNode boundsNode, SolrQueryMapperState state)
+        {
+            var orignialQuery = this.Visit(boundsNode.SourceNode, state);
+            var spatialQuery = new SolrQuery($"{boundsNode.Field}:[{boundsNode.LowerLefttLat},{boundsNode.LowerLeftLon} TO {boundsNode.UpperRightLat},{boundsNode.UpperRightLon}]");
+
+            if (state.FilterQuery == null)
+            {
+                state.FilterQuery = spatialQuery;
+            }
+            else
+            {
+                state.FilterQuery = state.FilterQuery && spatialQuery;
+            }
+
+            return orignialQuery;
         }
 
         protected virtual AbstractSolrQuery VisitWithinRadius(WithinRadiusNode radiusNode, SolrQueryMapper.SolrQueryMapperState state)

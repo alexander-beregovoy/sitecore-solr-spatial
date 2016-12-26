@@ -13,6 +13,7 @@ The module contains the following components:
 
 Supported Queries:
 
+.WithinBounds() : This method returns locations within specified rectangle area
 .WithinRadius() : This method returns locations within specific circle, results will be sorted based on the distance of the center of circle
 .OrderByNearest : Will sort the results by distance nearest to the location specified in the WithinRadius function
 

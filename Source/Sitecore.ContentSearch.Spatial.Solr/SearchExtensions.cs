@@ -10,6 +10,11 @@ namespace Sitecore.ContentSearch.Spatial.Solr
     {
         public static IQueryable<TSource> WithinRadius<TSource, TKey>(this IQueryable<TSource> source, Expression<Func<TSource, TKey>> keySelector, double lat, double lon, int radius)
         {
+            return WithinRadius(source, keySelector, lat, lon, System.Convert.ToDouble(radius));
+        }
+
+        public static IQueryable<TSource> WithinRadius<TSource, TKey>(this IQueryable<TSource> source, Expression<Func<TSource, TKey>> keySelector, double lat, double lon, double radius)
+        {
             if (source == null)
                 throw new ArgumentNullException("source");
             if (keySelector == null)
@@ -24,7 +29,7 @@ namespace Sitecore.ContentSearch.Spatial.Solr
                                               Expression.Quote(keySelector),
                                               Expression.Constant(lat,typeof(double)),
                                               Expression.Constant(lon,typeof(double)),
-                                              Expression.Constant(radius,typeof(int))
+                                              Expression.Constant(radius,typeof(double))
                                           });
             return source.Provider.CreateQuery<TSource>(exp);
         }

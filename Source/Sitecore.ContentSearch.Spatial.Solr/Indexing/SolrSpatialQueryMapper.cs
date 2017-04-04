@@ -50,7 +50,7 @@ namespace Sitecore.ContentSearch.Spatial.Solr.Indexing
         protected virtual AbstractSolrQuery VisitWithinRadius(WithinRadiusNode radiusNode, SolrQueryMapper.SolrQueryMapperState state)
         {
             var orignialQuery = this.Visit(radiusNode.SourceNode, state);
-            var spatialQuery = new SolrQuery(string.Format("{{!geofilt pt={0},{1} sfield={2} d={3} score=distance}}", radiusNode.Lat, radiusNode.Lon, radiusNode.Field, (int)radiusNode.Radius));
+            var spatialQuery = new SolrQuery(string.Format("{{!geofilt pt={0},{1} sfield={2} d={3} score=distance}}", radiusNode.Lat, radiusNode.Lon, radiusNode.Field, radiusNode.Radius));
             var combinedQuery = orignialQuery && spatialQuery;
             return combinedQuery;
         }

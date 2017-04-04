@@ -69,7 +69,7 @@ namespace Sitecore.ContentSearch.Spatial.Solr.Parsing
 
             var lat = (double)latExpression.Value;
             var lon = (double)lonExpression.Value;
-            var radius = (int)distanceExpression.Value;
+            var radius = (double)distanceExpression.Value;
             var lambdaExpression = Convert<LambdaExpression>(StripQuotes(GetArgument(methodCall.Arguments, 1)));
             if (lambdaExpression.Body.NodeType == ExpressionType.MemberAccess)
             {

@@ -5,7 +5,7 @@ namespace Sitecore.ContentSearch.Spatial.Solr.Nodes
 {
     public class WithinRadiusNode : QueryNode
     {
-        public WithinRadiusNode(QueryNode sourceNode, string field, double lat, double lon, int radius)
+        public WithinRadiusNode(QueryNode sourceNode, string field, double lat, double lon, double radius)
         {
             this.SourceNode = sourceNode;
             this.Field = field;
@@ -18,7 +18,7 @@ namespace Sitecore.ContentSearch.Spatial.Solr.Nodes
         public string Field { get; protected set; }
         public double Lat { get; protected set; }
         public double Lon { get; protected set; }
-        public int Radius { get; protected set; }
+        public double Radius { get; protected set; }
 
         public override QueryNodeType NodeType
         {

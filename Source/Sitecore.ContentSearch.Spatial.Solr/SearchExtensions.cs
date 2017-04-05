@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using Sitecore.ContentSearch.SearchTypes;
+using Sitecore.ContentSearch.Spatial.DataTypes;
 
 namespace Sitecore.ContentSearch.Spatial.Solr
 {
@@ -31,6 +33,26 @@ namespace Sitecore.ContentSearch.Spatial.Solr
                                               Expression.Constant(lon,typeof(double)),
                                               Expression.Constant(radius,typeof(double))
                                           });
+            return source.Provider.CreateQuery<TSource>(exp);
+        }
+
+        public static IQueryable<TSource> WithinAnyRadius<TSource, TKey>(this IQueryable<TSource> source, Expression<Func<TSource, TKey>> keySelector, IDictionary<SpatialPoint, double> pointsWithRadius)
+        {
+            if (source == null)
+                throw new ArgumentNullException("source");
+            if (keySelector == null)
+                throw new ArgumentNullException("keySelector");
+
+            var exp = Expression.Call(null,
+                                      ((MethodInfo)MethodBase.GetCurrentMethod()).MakeGenericMethod(typeof(TSource),
+                                                                                                     typeof(TKey)),
+                                      new Expression[3]
+                                          {
+                                              source.Expression,
+                                              Expression.Quote(keySelector),
+                                              Expression.Constant(pointsWithRadius,typeof(IDictionary<SpatialPoint, double>))
+                                          });
+
             return source.Provider.CreateQuery<TSource>(exp);
         }
 

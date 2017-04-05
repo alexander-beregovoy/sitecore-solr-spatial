@@ -87,6 +87,7 @@
   <ItemGroup>
     <Compile Include="Common\GenericDumpable.cs" />
     <Compile Include="Indexing\SpatialSolrQueryOptimizer.cs" />
+    <Compile Include="Nodes\WithinAnyRadiusNode.cs" />
     <Compile Include="Nodes\WithinBoundsNode.cs" />
     <Compile Include="Parsing\ExtendedGenericQueryable.cs" />
     <Compile Include="Parsing\ExtendedExpressionParser.cs" />
@@ -99,7 +100,12 @@
     <Compile Include="Provider\SwitchOnRebuildSolrSearchIndexWithSpatial.cs" />
     <Compile Include="SearchExtensions.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\Sitecore.ContentSearch.Spatial.DataTypes\Sitecore.ContentSearch.Spatial.DataTypes.csproj">
+      <Project>{695bb87f-1f33-475d-8123-a177a2af1b86}</Project>
+      <Name>Sitecore.ContentSearch.Spatial.DataTypes</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

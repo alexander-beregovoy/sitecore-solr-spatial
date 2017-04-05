@@ -1,4 +1,5 @@
-﻿using Sitecore.ContentSearch.Linq.Nodes;
+﻿using System.Collections.Generic;
+using Sitecore.ContentSearch.Linq.Nodes;
 using Sitecore.ContentSearch.Linq.Solr;
 using Sitecore.ContentSearch.Spatial.Solr.Nodes;
 using SolrNet;
@@ -19,6 +20,12 @@ namespace Sitecore.ContentSearch.Spatial.Solr.Indexing
                 if (withinRadiusNode != null)
                 {
                     return VisitWithinRadius(withinRadiusNode, state);
+                }
+
+                var withinAnyRadiusNode = node as WithinAnyRadiusNode;
+                if (withinAnyRadiusNode != null)
+                {
+                    return VisitWithinAnyRadius(withinAnyRadiusNode, state);
                 }
 
                 var withinBoundsNode = node as WithinBoundsNode;
@@ -54,7 +61,23 @@ namespace Sitecore.ContentSearch.Spatial.Solr.Indexing
             var combinedQuery = orignialQuery && spatialQuery;
             return combinedQuery;
         }
+
+        protected virtual AbstractSolrQuery VisitWithinAnyRadius(WithinAnyRadiusNode radiusNode, SolrQueryMapper.SolrQueryMapperState state)
+        {
+            var orignialQuery = this.Visit(radiusNode.SourceNode, state);
+            var queries = new List<string>();
+            foreach (var point in radiusNode.Points)
+            {
+                var queryString = string.Format("{{!geofilt pt={0},{1} sfield={2} d={3} score=distance}}", point.Key.Lat, point.Key.Lon, radiusNode.Field, point.Value);
+                queries.Add(queryString);
+            }
+            if (queries.Count > 0)
+            {
+                var spatialQuery = new SolrQuery(string.Format("({0})", string.Join(" OR ", queries)));
+                var combinedQuery = orignialQuery && spatialQuery;
+                return combinedQuery;
+            }
+            return orignialQuery;
+        }
     }
-
-
 }

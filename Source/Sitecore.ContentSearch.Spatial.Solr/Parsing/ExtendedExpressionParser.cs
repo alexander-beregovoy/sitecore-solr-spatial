@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 using Sitecore.ContentSearch.Linq.Common;
 using Sitecore.ContentSearch.Linq.Nodes;
 using Sitecore.ContentSearch.Linq.Parsing;
 using Sitecore.ContentSearch.Spatial.Solr.Nodes;
+using Sitecore.ContentSearch.Spatial.DataTypes;
 
 namespace Sitecore.ContentSearch.Spatial.Solr.Parsing
 {
@@ -29,6 +31,10 @@ namespace Sitecore.ContentSearch.Spatial.Solr.Parsing
                 case "WithinRadius":
                     var withinRadiusNode = this.VisitWithinRadiusMethod(methodCall);
                     return withinRadiusNode;
+
+                case "WithinAnyRadius":
+                    var withinAnyRadiusNode = this.VisitWithinAnyRadiusMethod(methodCall);
+                    return withinAnyRadiusNode;
 
                 case "WithinBounds":
                     var withinBoundsNode = this.VisitWithinBoundsMethod(methodCall);
@@ -91,6 +97,31 @@ namespace Sitecore.ContentSearch.Spatial.Solr.Parsing
             }
         }
 
-       
+        protected virtual QueryNode VisitWithinAnyRadiusMethod(MethodCallExpression methodCall)
+        {
+            QueryNode sourceNode = this.Visit(GetArgument(methodCall.Arguments, 0));
+            var pointsExpression = (ConstantExpression)GetArgument(methodCall.Arguments, 2);
+
+            var points = (IDictionary<SpatialPoint, double>)pointsExpression.Value;
+            var lambdaExpression = Convert<LambdaExpression>(StripQuotes(GetArgument(methodCall.Arguments, 1)));
+            if (lambdaExpression.Body.NodeType == ExpressionType.MemberAccess)
+            {
+                QueryNode queryNode = Visit(lambdaExpression.Body);
+                var fieldNode = queryNode as FieldNode;
+
+                if (fieldNode != null)
+                    return new WithinAnyRadiusNode(sourceNode, fieldNode.FieldKey, points);
+
+                throw new NotSupportedException(string.Format("Faceting can only be done on '{0}'. Expression used '{1}'", typeof(FieldNode).FullName, methodCall.Arguments[1].Type.FullName));
+            }
+            else
+            {
+                var fieldNode = Visit(lambdaExpression.Body) as FieldNode;
+                if (fieldNode == null)
+                    throw new NotSupportedException(string.Format("Ordering can only be done on '{0}'. Expression used '{1}'", typeof(FieldNode).FullName, methodCall.Arguments[1].Type.FullName));
+
+                return new WithinAnyRadiusNode(sourceNode, fieldNode.FieldKey, points);
+            }
+        }
     }
 }
